@@ -71,6 +71,9 @@ class JobOut(BaseModel):
     duration_ms: float | None = None
     avg_row_ms: float | None = None
     percent: float = 0.0
+    # Populated on the admin listing, where jobs span users.
+    user_id: str | None = None
+    user_email: str | None = None
 
 
 class JobListOut(BaseModel):

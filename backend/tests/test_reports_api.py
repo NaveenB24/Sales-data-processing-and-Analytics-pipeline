@@ -93,3 +93,14 @@ def test_failure_rate_reflects_failed_jobs(client, auth):
     assert job_queue.wait_idle(timeout=30.0)
     metrics = client.get("/api/metrics", headers=headers).json()
     assert metrics["job_failure_rate"] == 1.0
+
+
+def test_admin_job_listing_names_the_owner(client, auth, upload_sample):
+    admin, _ = auth(email="root4@example.com", role="admin")
+    member, member_user = auth(email="member4@example.com")
+    upload_sample(member)
+
+    listing = client.get("/api/admin/jobs", headers=admin).json()
+    job = next(j for j in listing["items"] if j["total_rows"] == 7)
+    assert job["user_email"] == "member4@example.com"
+    assert job["user_id"] == member_user["id"]

@@ -83,10 +83,19 @@ def list_all_jobs(
     offset: Annotated[int, Query(ge=0)] = 0,
 ) -> JobListOut:
     total = db.scalar(select(func.count()).select_from(Job)) or 0
-    jobs = db.scalars(select(Job).order_by(Job.created_at.desc()).limit(limit).offset(offset)).all()
+    # One join rather than a lazy load per row, so the owner column costs nothing.
+    rows = db.execute(
+        select(Job, User.email)
+        .join(User, User.id == Job.user_id)
+        .order_by(Job.created_at.desc())
+        .limit(limit)
+        .offset(offset)
+    ).all()
     items = []
-    for job in jobs:
+    for job, email in rows:
         out = JobOut.model_validate(job)
         out.percent = job.percent
+        out.user_id = job.user_id
+        out.user_email = email
         items.append(out)
     return JobListOut(items=items, total=total)
