@@ -18,3 +18,4 @@ Dependency order. Each task: RED (test) → GREEN → suite → commit.
 | 12 | Job detail charts & row explorer | Recharts views, export, admin page | done |
 | 13 | End-to-end verification | run both servers, Playwright walkthrough, 10k file | done |
 | 14 | README, run scripts, Dockerfiles, CI | docs + tooling | done |
+| 15 | Handoff handbook | `docs/handoff.html` → `docs/handoff.pdf` (39 pages) | done |

@@ -1,0 +1,1254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sales Data Processing &amp; Analytics Pipeline — Project Handbook</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm 16mm; }
+
+  :root{
+    --ink:#15181d; --muted:#5b6472; --faint:#8b94a3;
+    --rule:#d8dde5; --rule-soft:#eceff4;
+    --accent:#1f49c7; --accent-soft:#eef2fd;
+    --ok:#1b7f4b; --warn:#9a6a08; --bad:#b3261e;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body{
+    margin:0; color:var(--ink); background:#fff;
+    font:10.5pt/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+
+  h1,h2,h3,h4{ line-height:1.25; margin:0; font-weight:650; }
+  h2{ font-size:17pt; margin:0 0 2mm; padding-bottom:2mm; border-bottom:2px solid var(--ink); }
+  h3{ font-size:12.5pt; margin:7mm 0 2mm; color:var(--ink); }
+  h4{ font-size:10.5pt; margin:5mm 0 1.5mm; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+  p{ margin:0 0 3mm; }
+  ul,ol{ margin:0 0 3mm; padding-left:5mm; }
+  li{ margin:0 0 1.2mm; }
+  strong{ font-weight:650; }
+  code{ font-family:var(--mono); font-size:8.8pt; background:var(--rule-soft); padding:.5mm 1mm; border-radius:2px; }
+  a{ color:var(--accent); text-decoration:none; }
+
+  /* ---------- page system ---------- */
+  .page{ page-break-after:always; }
+  .page:last-child{ page-break-after:auto; }
+  .avoid{ page-break-inside:avoid; }
+
+  /* ---------- cover ---------- */
+  .cover{ height:247mm; display:flex; flex-direction:column; }
+  .cover-rule{ height:4px; background:var(--ink); margin-bottom:10mm; }
+  .eyebrow{ font-size:9pt; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); margin-bottom:6mm; }
+  .cover h1{ font-size:30pt; letter-spacing:-.4pt; margin-bottom:4mm; }
+  .cover .sub{ font-size:13pt; color:var(--muted); font-weight:400; max-width:140mm; line-height:1.45; }
+  .cover-spacer{ flex:1; }
+  .cover-meta{ display:grid; grid-template-columns:repeat(2,1fr); gap:5mm 10mm; border-top:1px solid var(--rule); padding-top:6mm; }
+  .cover-meta div span{ display:block; font-size:7.5pt; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); margin-bottom:1mm; }
+  .cover-meta div b{ font-size:10.5pt; font-weight:600; }
+  .cover-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:4mm; margin:10mm 0; }
+  .cover-stats div{ border:1px solid var(--rule); padding:4mm 3mm; }
+  .cover-stats b{ display:block; font-size:19pt; letter-spacing:-.5pt; margin-bottom:1mm; }
+  .cover-stats span{ font-size:8pt; color:var(--muted); line-height:1.35; display:block; }
+
+  /* ---------- contents ---------- */
+  .toc{ column-count:2; column-gap:12mm; }
+  .toc ol{ list-style:none; padding:0; margin:0; }
+  .toc li{ margin-bottom:2.2mm; break-inside:avoid; }
+  .toc .n{ display:inline-block; width:9mm; color:var(--faint); font-variant-numeric:tabular-nums; }
+  .toc .t{ font-weight:550; }
+  .toc .d{ display:block; margin-left:9mm; font-size:8.5pt; color:var(--muted); }
+
+  /* ---------- tables ---------- */
+  table{ width:100%; border-collapse:collapse; margin:0 0 4mm; font-size:9pt; }
+  th{ text-align:left; font-size:7.8pt; letter-spacing:.09em; text-transform:uppercase; color:var(--muted);
+      border-bottom:1.5px solid var(--ink); padding:0 2mm 1.6mm 0; }
+  td{ padding:1.8mm 2mm 1.8mm 0; border-bottom:1px solid var(--rule-soft); vertical-align:top; }
+  td code{ background:none; padding:0; }
+  tr{ page-break-inside:avoid; }
+  table.tight td,table.tight th{ padding-right:3mm; }
+
+  /* ---------- blocks ---------- */
+  pre{ font-family:var(--mono); font-size:8.3pt; line-height:1.5; background:#f7f8fa;
+       border:1px solid var(--rule); border-left:3px solid var(--ink);
+       padding:3mm 4mm; margin:0 0 4mm; overflow:visible; white-space:pre-wrap; word-break:break-word; }
+  pre.tree{ line-height:1.4; font-size:7.3pt; white-space:pre; }
+  .note{ border:1px solid var(--rule); border-left:3px solid var(--accent); background:var(--accent-soft);
+         padding:3mm 4mm; margin:0 0 4mm; font-size:9.3pt; }
+  .note b{ color:var(--accent); }
+  .warn{ border:1px solid #e8dcc0; border-left:3px solid var(--warn); background:#fdf8ec;
+         padding:3mm 4mm; margin:0 0 4mm; font-size:9.3pt; }
+  .warn b{ color:var(--warn); }
+  .lede{ font-size:11pt; color:var(--muted); margin:0 0 5mm; max-width:160mm; line-height:1.5; }
+
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:5mm; }
+  .grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:4mm; }
+  .box{ border:1px solid var(--rule); padding:3.5mm 4mm; }
+  .box h4{ margin-top:0; }
+  .box p:last-child{ margin-bottom:0; }
+
+  figure{ margin:0 0 5mm; page-break-inside:avoid; }
+  figure img{ width:100%; border:1px solid var(--rule); display:block; }
+  figcaption{ font-size:8.3pt; color:var(--muted); margin-top:1.8mm; }
+  .shot-tall img{ max-height:205mm; width:auto; max-width:100%; margin:0 auto; }
+
+  .pill{ display:inline-block; font-size:7.6pt; font-weight:650; letter-spacing:.05em; text-transform:uppercase;
+         border:1px solid currentColor; border-radius:999px; padding:.3mm 1.8mm; }
+  .pill.ok{ color:var(--ok); } .pill.bad{ color:var(--bad); } .pill.dup{ color:var(--warn); }
+
+  svg{ display:block; margin:0 auto 3mm; max-width:100%; }
+  .svg-caption{ font-size:8.3pt; color:var(--muted); text-align:center; margin-bottom:5mm; }
+</style>
+</head>
+<body>
+
+<!-- ============================ COVER ============================ -->
+<section class="page cover">
+  <div class="cover-rule"></div>
+  <div class="eyebrow">Project Handbook &amp; Handover</div>
+  <h1>Sales Data Processing<br>&amp; Analytics Pipeline</h1>
+  <p class="sub">A self-contained full-stack system that ingests bulk sales files, validates and
+  processes them concurrently, computes analytical metrics, and streams live progress to a
+  React dashboard.</p>
+
+  <div class="cover-stats">
+    <div><b>138</b><span>automated tests, all passing</span></div>
+    <div><b>95%</b><span>backend statement coverage</span></div>
+    <div><b>10,000</b><span>rows processed in ~4 seconds</span></div>
+    <div><b>0</b><span>external services required</span></div>
+  </div>
+
+  <div class="cover-spacer"></div>
+
+  <div class="cover-meta">
+    <div><span>Document</span><b>Project handbook · v1.0</b></div>
+    <div><span>Date</span><b>2 October 2026</b></div>
+    <div><span>Stack</span><b>Python · FastAPI · SQLite · React · TypeScript</b></div>
+    <div><span>Status</span><b>Complete — runs locally, end-to-end verified</b></div>
+  </div>
+</section>
+
+<!-- ============================ CONTENTS ============================ -->
+<section class="page">
+  <h2>Contents</h2>
+  <p class="lede">This handbook is written to be read start to finish by someone with no prior
+  knowledge of the project. Sections 1–3 get you oriented and running; 4–9 explain how the system
+  works; 10–15 cover the engineering judgment behind it.</p>
+
+  <div class="toc">
+    <ol>
+      <li><span class="n">1</span><span class="t">What this project is</span>
+        <span class="d">The assignment, and what was delivered against it.</span></li>
+      <li><span class="n">2</span><span class="t">Running it on your machine</span>
+        <span class="d">Three commands, from clone to working dashboard.</span></li>
+      <li><span class="n">3</span><span class="t">Repository map</span>
+        <span class="d">Every directory and what lives in it.</span></li>
+      <li><span class="n">4</span><span class="t">How it works, end to end</span>
+        <span class="d">The journey of one uploaded file.</span></li>
+      <li><span class="n">5</span><span class="t">The concurrency model</span>
+        <span class="d">Why threads, why a queue, and how determinism survives.</span></li>
+      <li><span class="n">6</span><span class="t">The data model</span>
+        <span class="d">Four tables, and why each index exists.</span></li>
+      <li><span class="n">7</span><span class="t">Business rules</span>
+        <span class="d">Validation, derived values, metrics, duplicates.</span></li>
+      <li><span class="n">8</span><span class="t">API reference</span>
+        <span class="d">Every endpoint, what it takes and returns.</span></li>
+      <li><span class="n">9</span><span class="t">The dashboard</span>
+        <span class="d">Screen by screen, with screenshots.</span></li>
+      <li><span class="n">10</span><span class="t">Observability</span>
+        <span class="d">Logs, correlation IDs, metrics.</span></li>
+      <li><span class="n">11</span><span class="t">Security posture</span>
+        <span class="d">Auth, isolation, upload safety.</span></li>
+      <li><span class="n">12</span><span class="t">Testing &amp; evidence</span>
+        <span class="d">What is proven, and how to re-prove it.</span></li>
+      <li><span class="n">13</span><span class="t">Design decisions &amp; tradeoffs</span>
+        <span class="d">The choices made, and what each one costs.</span></li>
+      <li><span class="n">14</span><span class="t">How AI tools were used</span>
+        <span class="d">Method, division of labour, and verification.</span></li>
+      <li><span class="n">15</span><span class="t">Known limits &amp; next steps</span>
+        <span class="d">Honest boundaries of the current build.</span></li>
+      <li><span class="n">A</span><span class="t">Configuration reference</span>
+        <span class="d">Every environment variable.</span></li>
+      <li><span class="n">B</span><span class="t">Troubleshooting</span>
+        <span class="d">What to do when something does not start.</span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================ 1 ============================ -->
+<section class="page">
+  <h2>1 · What this project is</h2>
+  <p class="lede">The brief asked for a full-stack system that ingests bulk sales data, processes it
+  concurrently, computes analytical metrics, and presents them on a live dashboard — fully
+  self-contained, with no external APIs.</p>
+
+  <h3>1.1 The seven requirements, and where each one lives</h3>
+  <table class="tight">
+    <thead><tr><th style="width:34%">Requirement</th><th style="width:30%">Where it is implemented</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><b>1. Authentication &amp; users</b></td><td><code>app/routers/auth.py</code><br><code>app/security.py</code></td>
+        <td>Signup and login with bcrypt-hashed passwords and JWTs. Users only ever see their own jobs. Role-based admin access is included.</td></tr>
+      <tr><td><b>2. Upload &amp; processing</b></td><td><code>app/routers/jobs.py</code><br><code>app/processing/validation.py</code></td>
+        <td>CSV and JSON upload, per-row validation with named error codes, derived <code>net_amount</code>, and a simulated per-row cost so concurrency matters.</td></tr>
+      <tr><td><b>3. Aggregation &amp; math</b></td><td><code>app/processing/metrics.py</code></td>
+        <td>Revenue totals and breakdowns, average, median, standard deviation with a variance flag, top 5, daily and monthly trends, discount impact.</td></tr>
+      <tr><td><b>4. Concurrency &amp; scheduling</b></td><td><code>app/processing/pipeline.py</code><br><code>app/processing/queue.py</code></td>
+        <td>A worker pool validates rows in parallel; a background queue runs jobs. Processing and re-aggregation can both be triggered on demand.</td></tr>
+      <tr><td><b>5. Database design</b></td><td><code>app/models.py</code></td>
+        <td>Four tables with indexes chosen for the queries that actually run. Verified on 10,000-row files.</td></tr>
+      <tr><td><b>6. UI / dashboard</b></td><td><code>frontend/src/</code></td>
+        <td>Upload with live progress, job summaries, three chart types, top-5 table, row explorer, annotated export.</td></tr>
+      <tr><td><b>7. Logging &amp; observability</b></td><td><code>app/logging_config.py</code><br><code>app/routers/admin.py</code></td>
+        <td>Structured JSON logs with levels, a correlation ID per job, and a metrics endpoint with failure rate and timing.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.2 Bonus items that were also built</h3>
+  <div class="grid3">
+    <div class="box"><h4>Role-based access</h4><p>The first account registered becomes an administrator and gains a system-wide view of users, jobs and metrics.</p></div>
+    <div class="box"><h4>Background job queue</h4><p>Uploads return immediately; a dispatcher thread runs jobs and publishes live progress.</p></div>
+    <div class="box"><h4>WebSocket live updates</h4><p>Progress streams over a socket, with automatic polling fallback if the socket cannot open.</p></div>
+    <div class="box"><h4>Structured JSON logging</h4><p>Machine-readable log lines with levels and correlation IDs for tracing a job across threads.</p></div>
+    <div class="box"><h4>Rate limiting &amp; retries</h4><p>Per-user upload throttling; transient row failures are retried with backoff before being demoted.</p></div>
+    <div class="box"><h4>CI/CD &amp; Docker</h4><p>GitHub Actions runs tests, type-checks and image builds. Docker Compose brings the whole stack up.</p></div>
+  </div>
+
+  <h3>1.3 What was deliberately not built</h3>
+  <p>Redis, Celery, Postgres and a scheduled-email reporter were all considered and left out. Section 13
+  explains why in each case, and Section 15 states the limits that choice creates. The short version:
+  the brief rewards a system that runs anywhere with no setup, and every omitted piece sits behind a
+  narrow interface so it can be swapped in later without touching the rest of the code.</p>
+</section>
+
+<!-- ============================ 2 ============================ -->
+<section class="page">
+  <h2>2 · Running it on your machine</h2>
+  <p class="lede">You need Python 3.12 or newer and Node.js 20 or newer. Nothing else — no database
+  server, no Redis, no Docker (unless you want it).</p>
+
+  <h3>2.1 The three-command path</h3>
+<pre>git clone &lt;repository-url&gt; sales-data-processor
+cd sales-data-processor
+
+./scripts/setup.sh     # creates the Python virtualenv, installs backend + frontend packages
+./scripts/dev.sh       # starts the API on :8000 and the dashboard on :5173</pre>
+
+  <p>Then open <b>http://localhost:5173</b> in a browser. Create an account, and upload
+  <code>sample_data/sample_sales.csv</code> — the seven-row file from the brief.</p>
+
+  <div class="note"><b>The first account you create becomes the administrator.</b> That is what
+  unlocks the Administration page on a fresh install, with no seeding step or fixture user. Every
+  account created after the first is an ordinary user.</div>
+
+  <h3>2.2 What you should see</h3>
+  <table class="tight">
+    <thead><tr><th style="width:30%">Step</th><th>Expected result</th></tr></thead>
+    <tbody>
+      <tr><td>Open the dashboard</td><td>Login screen. The footer reads <code>API ok · v1.0.0 · database ok</code> — if it does not, the backend is not reachable.</td></tr>
+      <tr><td>Create an account</td><td>You land on the dashboard with an <b>Admin</b> badge beside your email.</td></tr>
+      <tr><td>Upload the sample file</td><td>A toast confirms the upload, a job row appears, and it completes almost instantly.</td></tr>
+      <tr><td>Read the job row</td><td><b>7</b> rows · <b>3 / 3 / 1</b> valid / invalid / duplicate.</td></tr>
+      <tr><td>Open the job</td><td>Total revenue <b>$1,735.93</b>, average order value <b>$578.64</b>, median <b>$199.96</b>, discount impact <b>$199.99</b>, three charts, and a seven-row explorer.</td></tr>
+      <tr><td>Upload <code>large_sales.csv</code></td><td>A live progress bar counts up to 10,000 rows and finishes in a few seconds.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.3 Running by hand, without the scripts</h3>
+<pre># Terminal 1 — the API
+python3 -m venv .venv
+.venv/bin/pip install -r backend/requirements.txt
+cd backend &amp;&amp; ../.venv/bin/python -m uvicorn app.main:app --reload --port 8000
+
+# Terminal 2 — the dashboard
+cd frontend &amp;&amp; npm install &amp;&amp; npm run dev</pre>
+
+  <h3>2.4 Running the tests</h3>
+<pre>./scripts/test.sh          # the fast suite — about 10 seconds
+./scripts/test.sh --slow   # everything, including the 10,000-row run — about 25 seconds</pre>
+
+  <h3>2.5 Running with Docker instead</h3>
+<pre>JWT_SECRET=$(openssl rand -hex 32) docker compose up --build
+# dashboard: http://localhost:8080     API: http://localhost:8000/api/docs</pre>
+  <p>Compose builds two images — the API on Python, and the dashboard as static files behind nginx,
+  which also proxies <code>/api</code> and <code>/ws</code> through to the API so everything is
+  served from one origin.</p>
+
+  <h3>2.6 Useful extras</h3>
+<pre># Interactive API documentation (generated from the code)
+open http://localhost:8000/api/docs
+
+# Generate a larger test file
+.venv/bin/python scripts/generate_sample_data.py --rows 50000 --out sample_data/big.csv
+
+# Watch the structured logs as they happen
+tail -f backend/logs/app.log</pre>
+</section>
+
+<!-- ============================ 3 ============================ -->
+<section class="page">
+  <h2>3 · Repository map</h2>
+  <p class="lede">Both halves of the system live in one repository. The backend is a Python package,
+  the frontend a Vite app, and they share nothing but the HTTP contract.</p>
+
+<pre class="tree">sales-data-processor/
+├── README.md                  Setup, features, API summary, design decisions
+├── SPEC.md                    The written contract the code was built against
+├── docker-compose.yml         Two-service stack: API + nginx-served dashboard
+│
+├── backend/
+│   ├── requirements.txt       Pinned Python dependencies
+│   ├── .env.example           Every setting, with its default
+│   ├── Dockerfile             Production image (non-root, health-checked)
+│   └── app/
+│       ├── main.py            App factory: middleware, routers, lifespan, SPA hosting
+│       ├── config.py          Settings, read from the environment with defaults
+│       ├── db.py              SQLite engine (WAL mode), session factory
+│       ├── models.py          The four tables and their indexes
+│       ├── schemas.py         Request/response shapes — the wire contract
+│       ├── security.py        Password hashing and JWT issue/verify
+│       ├── deps.py            Shared dependencies: session, current user, admin guard
+│       ├── ratelimit.py       Token-bucket limiter for uploads
+│       ├── logging_config.py  Structured JSON logging with correlation IDs
+│       ├── routers/
+│       │   ├── auth.py        Signup, login, current user
+│       │   ├── jobs.py        Upload, process, rows, report, export, delete
+│       │   ├── reports.py     Cross-job reporting
+│       │   ├── admin.py       Admin views, system metrics, health
+│       │   └── ws.py          WebSocket progress channel
+│       └── processing/
+│           ├── validation.py  Row parsing, validation rules, duplicate tracking
+│           ├── metrics.py     Pure maths — no database, no I/O
+│           ├── pipeline.py    The worker pool and the job run itself
+│           ├── queue.py       Background dispatcher
+│           └── events.py      Thread-to-WebSocket event fan-out
+│   └── tests/                 138 tests across 10 files
+│
+├── frontend/
+│   ├── vite.config.ts         Dev server + proxy to the API
+│   ├── Dockerfile             Build then serve via nginx
+│   ├── nginx.conf             SPA fallback, /api and /ws proxying
+│   └── src/
+│       ├── main.tsx           Entry point, providers, router
+│       ├── App.tsx            Routes and the protected-route wrapper
+│       ├── api/               Typed fetch client and the API types
+│       ├── auth/              Authentication context and token storage
+│       ├── hooks/             useJobProgress (WebSocket + polling fallback)
+│       ├── components/        Reusable UI: tables, tiles, charts, toasts, upload
+│       ├── pages/             Login, Signup, Dashboard, Job detail, Admin
+│       ├── lib/               Formatting and chart helpers
+│       └── styles/            The design system (tokens, light/dark)
+│
+├── scripts/
+│   ├── setup.sh               One-time install of everything
+│   ├── dev.sh                 Start both servers together
+│   ├── test.sh                Run the test suite
+│   └── generate_sample_data.py  Make test files of any size
+│
+├── sample_data/
+│   ├── sample_sales.csv       The brief's seven-row file, unmodified
+│   └── large_sales.csv        10,000 generated rows
+│
+├── docs/
+│   ├── ARCHITECTURE.md        Deeper architectural notes
+│   └── handoff.pdf            This document
+│
+└── .github/workflows/ci.yml   Tests, type-check and image builds on every push</pre>
+
+  <h3>3.1 Size of the thing</h3>
+  <table class="tight">
+    <thead><tr><th>Area</th><th>Files</th><th>Lines</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Backend application</td><td>17</td><td>~2,840</td><td>Including docstrings and comments</td></tr>
+      <tr><td>Backend tests</td><td>10</td><td>~1,910</td><td>138 tests, 95% statement coverage</td></tr>
+      <tr><td>Frontend source</td><td>28</td><td>~6,060</td><td>Including the hand-written CSS design system</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.2 The two files worth reading first</h3>
+  <p><code>SPEC.md</code> is the contract: validation rules with named error codes, the data model,
+  the full API surface, and numeric acceptance criteria. It was written <i>before</i> the code and
+  the code was built against it.</p>
+  <p><code>backend/app/processing/pipeline.py</code> is the heart of the system — the function that
+  takes a job id and turns a file on disk into validated rows and stored reports. If you read one
+  implementation file, read that one.</p>
+</section>
+
+<!-- ============================ 4 ============================ -->
+<section class="page">
+  <h2>4 · How it works, end to end</h2>
+  <p class="lede">Follow one uploaded file from the browser to the chart that renders it.</p>
+
+  <svg viewBox="0 0 700 390" xmlns="http://www.w3.org/2000/svg" style="max-height:132mm">
+    <defs>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="#15181d"/>
+      </marker>
+    </defs>
+    <g font-family="Helvetica,Arial,sans-serif" fill="#15181d">
+      <!-- browser -->
+      <rect x="10" y="20" width="170" height="110" fill="none" stroke="#15181d" stroke-width="1.5"/>
+      <text x="24" y="42" font-size="12" font-weight="700">Browser</text>
+      <text x="24" y="62" font-size="10">React dashboard</text>
+      <text x="24" y="78" font-size="10">• Upload card</text>
+      <text x="24" y="93" font-size="10">• Live progress bar</text>
+      <text x="24" y="108" font-size="10">• Charts &amp; row explorer</text>
+
+      <!-- api -->
+      <rect x="265" y="20" width="175" height="110" fill="none" stroke="#15181d" stroke-width="1.5"/>
+      <text x="279" y="42" font-size="12" font-weight="700">FastAPI</text>
+      <text x="279" y="62" font-size="10">auth · jobs · reports</text>
+      <text x="279" y="78" font-size="10">admin · websocket</text>
+      <text x="279" y="97" font-size="9" fill="#5b6472">Validates the token,</text>
+      <text x="279" y="110" font-size="9" fill="#5b6472">scopes every query by user</text>
+
+      <!-- queue -->
+      <rect x="265" y="175" width="175" height="62" fill="none" stroke="#15181d" stroke-width="1.5"/>
+      <text x="279" y="197" font-size="12" font-weight="700">Job queue</text>
+      <text x="279" y="215" font-size="9.5" fill="#5b6472">One dispatcher thread,</text>
+      <text x="279" y="228" font-size="9.5" fill="#5b6472">jobs run one at a time</text>
+
+      <!-- pool -->
+      <rect x="265" y="275" width="175" height="98" fill="none" stroke="#15181d" stroke-width="1.5"/>
+      <text x="279" y="297" font-size="12" font-weight="700">Worker pool</text>
+      <text x="279" y="315" font-size="9.5" fill="#5b6472">8 threads validate rows</text>
+      <text x="279" y="328" font-size="9.5" fill="#5b6472">in parallel, in batches</text>
+      <line x1="279" y1="338" x2="425" y2="338" stroke="#d8dde5"/>
+      <text x="279" y="353" font-size="9.5" fill="#5b6472">Duplicates applied after,</text>
+      <text x="279" y="366" font-size="9.5" fill="#5b6472">in row order → deterministic</text>
+
+      <!-- db -->
+      <rect x="520" y="275" width="165" height="98" fill="none" stroke="#15181d" stroke-width="1.5"/>
+      <text x="534" y="297" font-size="12" font-weight="700">SQLite (WAL)</text>
+      <text x="534" y="317" font-size="10">users · jobs</text>
+      <text x="534" y="333" font-size="10">transactions</text>
+      <text x="534" y="349" font-size="10">reports</text>
+      <text x="534" y="366" font-size="9" fill="#5b6472">Readers never block writers</text>
+
+      <!-- events -->
+      <rect x="520" y="175" width="165" height="62" fill="none" stroke="#15181d" stroke-width="1.5"/>
+      <text x="534" y="197" font-size="12" font-weight="700">Event hub</text>
+      <text x="534" y="215" font-size="9.5" fill="#5b6472">Worker threads →</text>
+      <text x="534" y="228" font-size="9.5" fill="#5b6472">WebSocket subscribers</text>
+
+      <!-- arrows -->
+      <line x1="180" y1="58" x2="258" y2="58" stroke="#15181d" stroke-width="1.3" marker-end="url(#ah)"/>
+      <text x="186" y="52" font-size="8.5" fill="#5b6472">upload / read</text>
+      <line x1="258" y1="95" x2="182" y2="95" stroke="#15181d" stroke-width="1.3" marker-end="url(#ah)"/>
+      <text x="186" y="110" font-size="8.5" fill="#5b6472">JSON + live events</text>
+
+      <line x1="352" y1="130" x2="352" y2="170" stroke="#15181d" stroke-width="1.3" marker-end="url(#ah)"/>
+      <text x="358" y="155" font-size="8.5" fill="#5b6472">enqueue(job_id)</text>
+
+      <line x1="352" y1="237" x2="352" y2="270" stroke="#15181d" stroke-width="1.3" marker-end="url(#ah)"/>
+      <text x="358" y="258" font-size="8.5" fill="#5b6472">run</text>
+
+      <line x1="440" y1="324" x2="515" y2="324" stroke="#15181d" stroke-width="1.3" marker-end="url(#ah)"/>
+      <text x="444" y="317" font-size="8.5" fill="#5b6472">bulk insert</text>
+
+      <line x1="440" y1="290" x2="515" y2="215" stroke="#15181d" stroke-width="1.3" marker-end="url(#ah)"/>
+      <text x="452" y="252" font-size="8.5" fill="#5b6472">progress</text>
+
+      <line x1="602" y1="175" x2="602" y2="140" stroke="#15181d" stroke-width="1.3"/>
+      <line x1="602" y1="140" x2="445" y2="140" stroke="#15181d" stroke-width="1.3"/>
+      <line x1="445" y1="140" x2="445" y2="95" stroke="#15181d" stroke-width="1.3" marker-end="url(#ah)"/>
+    </g>
+  </svg>
+  <p class="svg-caption">The system in one picture. Everything inside the outer boxes runs in a single
+  Python process; the database is one file on disk.</p>
+
+  <h3>4.1 The seven steps</h3>
+  <table class="tight">
+    <thead><tr><th style="width:6%">#</th><th style="width:22%">Step</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><b>Upload</b></td><td>The file streams to disk in 1&nbsp;MB chunks, with the size cap checked <i>while</i> writing so an oversized file never fully lands. A job row is created in <code>pending</code> and stamped with a correlation ID. A per-user rate limiter guards the endpoint.</td></tr>
+      <tr><td>2</td><td><b>Queue</b></td><td>The job id goes onto the queue — automatically if "process on upload" is ticked, or later when the user presses Process. A background dispatcher thread pulls ids one at a time.</td></tr>
+      <tr><td>3</td><td><b>Process</b></td><td>The file is streamed and its rows handed to a pool of worker threads in bounded batches. Each row pays a small simulated processing cost, then gets validated. A row whose processing throws is retried with backoff.</td></tr>
+      <tr><td>4</td><td><b>De-duplicate</b></td><td>Workers finish out of order, so duplicates are <i>not</i> detected inside them. Each completed batch is re-sorted by row number and passed through the duplicate tracker on a single thread. Same file in, same answer out, every time.</td></tr>
+      <tr><td>5</td><td><b>Persist</b></td><td>Rows are bulk-inserted in chunks. The job's counters advance as batches land, and a progress event is published every 25 rows.</td></tr>
+      <tr><td>6</td><td><b>Aggregate</b></td><td>The stored rows are streamed back and the metrics computed, then written as six report records — one per metric family. Keeping this separate from row processing is what makes "re-run aggregation" cheap and independent.</td></tr>
+      <tr><td>7</td><td><b>Deliver</b></td><td>The dashboard reads the report for its charts and the rows endpoint for the explorer. Export re-streams the rows as annotated CSV or JSON.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note"><b>Nothing in a bad file can crash the pipeline.</b> A malformed row becomes an
+  <code>invalid</code> row carrying an error code. Only an unreadable <i>file</i> fails the job — and
+  that marks it <code>failed</code> with a message while the API keeps serving everyone else.</div>
+</section>
+
+<!-- ============================ 5 ============================ -->
+<section class="page">
+  <h2>5 · The concurrency model</h2>
+  <p class="lede">The brief requires that row validation runs concurrently rather than sequentially.
+  This section explains what was built and why each choice was made.</p>
+
+  <h3>5.1 Two levels of parallelism</h3>
+  <p>There are two separate questions — how many <i>jobs</i> run at once, and how many <i>rows</i>
+  within a job run at once. They get different answers.</p>
+
+  <div class="grid2">
+    <div class="box">
+      <h4>Jobs: one at a time</h4>
+      <p>A single dispatcher thread pulls job ids off the queue and runs them in sequence. SQLite
+      permits one writer at a time, so running several write-heavy jobs concurrently would just
+      produce lock contention and retries.</p>
+      <p>The user never waits for this: the upload returns immediately and the job runs behind them.</p>
+    </div>
+    <div class="box">
+      <h4>Rows: eight at a time</h4>
+      <p>Inside each job, a pool of worker threads validates rows in parallel. This is where the
+      brief's concurrency requirement is met, and where the measurable speedup comes from.</p>
+      <p>The pool size is configurable via <code>WORKER_POOL_SIZE</code>.</p>
+    </div>
+  </div>
+
+  <h3>5.2 Why threads rather than async or processes</h3>
+  <p>The simulated per-row cost is a sleep, which is I/O-shaped, and the real work — parsing,
+  arithmetic, validation — is short. Threads therefore give genuine wall-clock speedup without
+  process-spawn cost, without pickling rows between processes, and without rewriting the
+  synchronous database layer as async. If row processing ever became genuinely CPU-bound, swapping
+  <code>ThreadPoolExecutor</code> for <code>ProcessPoolExecutor</code> is a change contained to one module.</p>
+
+  <h3>5.3 The measured result</h3>
+  <table class="tight">
+    <thead><tr><th>Scenario</th><th>Sequential would take</th><th>Actual</th><th>Where it is proven</th></tr></thead>
+    <tbody>
+      <tr><td>120 rows at 25&nbsp;ms each, pool of 8</td><td>3.00 s</td><td><b>0.39 s</b></td><td><code>test_concurrency.py</code></td></tr>
+      <tr><td>10,000 rows at 2&nbsp;ms each, pool of 8</td><td>20.0 s</td><td><b>~3.8 s</b></td><td><code>test_scale.py</code>, and observed live</td></tr>
+    </tbody>
+  </table>
+  <p>The concurrency test asserts a hard upper bound on wall-clock time, so if someone silently makes
+  the pipeline sequential again, the suite fails rather than quietly getting slower.</p>
+
+  <h3>5.4 Keeping the output deterministic</h3>
+  <p>Parallelism creates a trap: if duplicate detection ran inside the workers, <i>which</i> row got
+  marked as the original would depend on which thread happened to finish first. The same file could
+  produce different reports on different runs.</p>
+  <p>The fix is to split the work. Validation — which is pure and order-independent — runs in
+  parallel. Duplicate detection — which is inherently order-dependent — runs single-threaded, over
+  each completed batch, in row-number order. Slightly more code; completely reproducible output.</p>
+
+  <h3>5.5 Keeping memory bounded</h3>
+  <p>Three separate mechanisms stop a large file from being held in memory at once: the parser
+  streams rows rather than reading the file into a list, at most 2,000 futures are in flight at a
+  time, and rows are inserted in chunks of 1,000. Reading back for aggregation and export uses
+  streaming cursors. A 10,000-row file was verified end to end; the same code path handles far larger
+  files at constant memory.</p>
+
+  <h3>5.6 Retry behaviour</h3>
+  <p>If processing a row raises an unexpected exception, it is retried twice with a short backoff.
+  If it still fails, that row is marked <code>invalid</code> with the code
+  <code>PROCESSING_ERROR</code> and the job carries on. One poisonous row cannot take down a
+  10,000-row import.</p>
+</section>
+
+<!-- ============================ 6 ============================ -->
+<section class="page">
+  <h2>6 · The data model</h2>
+  <p class="lede">Four tables in one SQLite file. Every index exists because a specific query needs
+  it, not by reflex.</p>
+
+  <h3>6.1 The tables</h3>
+  <table class="tight">
+    <thead><tr><th style="width:18%">Table</th><th style="width:36%">Key columns</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><b>users</b></td><td><code>id</code>, <code>email</code> (unique), <code>password_hash</code>, <code>role</code>, <code>created_at</code></td>
+        <td>Accounts. <code>role</code> is <code>user</code> or <code>admin</code>; the first account registered becomes admin.</td></tr>
+      <tr><td><b>jobs</b></td><td><code>id</code>, <code>user_id</code>, <code>original_filename</code>, <code>status</code>, row counters, <code>correlation_id</code>, timing fields</td>
+        <td>One per uploaded file. Carries the live counters the progress bar reads, and the timing used by the metrics endpoint.</td></tr>
+      <tr><td><b>transactions</b></td><td><code>job_id</code>, <code>row_number</code>, the seven input columns, derived amounts, <code>status</code>, <code>errors</code>, <code>raw</code></td>
+        <td>Every parsed row — valid, invalid and duplicate alike. This <i>is</i> the error report, and the annotated export is a dump of it.</td></tr>
+      <tr><td><b>reports</b></td><td><code>job_id</code>, <code>kind</code>, <code>payload</code>, <code>created_at</code></td>
+        <td>Computed metrics, one record per family: summary, by region, by category, daily trend, monthly trend, top transactions.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6.2 Why the indexes exist</h3>
+  <table class="tight">
+    <thead><tr><th style="width:48%">The query that runs</th><th>The index that serves it</th></tr></thead>
+    <tbody>
+      <tr><td>"My jobs, newest first" — the dashboard list</td><td><code>jobs (user_id, created_at)</code></td></tr>
+      <tr><td>Row explorer filtered by status</td><td><code>transactions (job_id, status)</code></td></tr>
+      <tr><td>Top 5 transactions by value</td><td><code>transactions (job_id, net_amount)</code></td></tr>
+      <tr><td>Daily and monthly trend scans</td><td><code>transactions (job_id, transaction_date)</code></td></tr>
+      <tr><td>Duplicate lookups and row search</td><td><code>transactions (job_id, transaction_id)</code></td></tr>
+      <tr><td>"Revenue-by-region for this user's last 10 jobs"</td><td><code>jobs (user_id, created_at)</code> joined to unique <code>reports (job_id, kind)</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="note"><b>That last row is the brief's own example query.</b> It resolves to a single
+  indexed join rather than a scan, because reports are stored one record per metric family instead
+  of as one large blob per job. Fetching the region chart never deserialises the trend data.</div>
+
+  <h3>6.3 SQLite configuration</h3>
+  <p>The database opens with four settings that matter for this workload:</p>
+  <table class="tight">
+    <thead><tr><th style="width:30%">Setting</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><code>journal_mode = WAL</code></td><td>Readers never block on the writer, so the dashboard stays responsive while a job writes rows.</td></tr>
+      <tr><td><code>synchronous = NORMAL</code></td><td>The usual durability-for-throughput trade for an analytics workload.</td></tr>
+      <tr><td><code>foreign_keys = ON</code></td><td>Deleting a job genuinely cascades to its rows and reports.</td></tr>
+      <tr><td><code>busy_timeout = 30000</code></td><td>Brief write contention waits rather than failing.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6.4 Moving to PostgreSQL</h3>
+  <p>Change <code>DATABASE_URL</code>. Nothing in the application code assumes SQLite — the engine
+  builder applies the SQLite-specific settings only when the URL says SQLite, and everything else
+  goes through SQLAlchemy. The one thing a production move would add is a migration tool; the
+  schema is currently created directly from the models, which is fine for a greenfield database but
+  would need Alembic once there is data worth preserving.</p>
+</section>
+
+<!-- ============================ 7 ============================ -->
+<section class="page">
+  <h2>7 · Business rules</h2>
+  <p class="lede">What makes a row valid, what gets computed from it, and how duplicates are decided.</p>
+
+  <h3>7.1 Validation rules</h3>
+  <p>Every row ends up in exactly one of three states — <span class="pill ok">valid</span>
+  <span class="pill bad">invalid</span> <span class="pill dup">duplicate</span> — and carries a list
+  of error codes explaining why.</p>
+
+  <table class="tight">
+    <thead><tr><th style="width:24%">Field</th><th style="width:40%">Rule</th><th>Error code when it fails</th></tr></thead>
+    <tbody>
+      <tr><td><code>transaction_id</code></td><td>Required, non-empty</td><td><code>MISSING_FIELD</code></td></tr>
+      <tr><td><code>region</code></td><td>Required, non-empty</td><td><code>MISSING_FIELD</code></td></tr>
+      <tr><td><code>product_category</code></td><td>Required, non-empty</td><td><code>MISSING_FIELD</code></td></tr>
+      <tr><td><code>quantity</code></td><td>Required, a whole number greater than zero</td><td><code>MISSING_FIELD</code> · <code>NOT_A_NUMBER</code> · <code>NEGATIVE_VALUE</code></td></tr>
+      <tr><td><code>unit_price</code></td><td>Required, numeric, not negative</td><td><code>MISSING_FIELD</code> · <code>NOT_A_NUMBER</code> · <code>NEGATIVE_VALUE</code></td></tr>
+      <tr><td><code>discount_percent</code></td><td><b>Optional</b> — blank means zero. If present, numeric and between 0 and 100</td><td><code>NOT_A_NUMBER</code> · <code>OUT_OF_RANGE</code></td></tr>
+      <tr><td><code>transaction_date</code></td><td>Required, parseable, and not in the future</td><td><code>MISSING_FIELD</code> · <code>INVALID_DATE</code> · <code>FUTURE_DATE</code></td></tr>
+      <tr><td>— the whole row —</td><td>A line that cannot be read as a record at all</td><td><code>MALFORMED_ROW</code></td></tr>
+      <tr><td>— the whole row —</td><td>Processing threw and ran out of retries</td><td><code>PROCESSING_ERROR</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.2 Duplicates — and a conflict in the brief</h3>
+  <div class="warn"><b>The brief contradicts itself here, and the resolution matters.</b>
+  It asks for "duplicate <code>transaction_id</code>s flagged". But its own sample file describes
+  <code>TXN-1005</code> as "a duplicate of <code>TXN-1001</code>" — and those two IDs are
+  <i>different</i>. Only the row contents repeat. Implementing the stated rule literally would have
+  failed the brief's own acceptance note.</div>
+
+  <p>Both signals are therefore implemented:</p>
+  <table class="tight">
+    <thead><tr><th style="width:26%">Code</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>DUPLICATE_ID</code></td><td>The same <code>transaction_id</code> appears again — the same record submitted twice.</td></tr>
+      <tr><td><code>DUPLICATE_RECORD</code></td><td>A fresh ID, but every other field matches an earlier row — the same sale re-submitted under a new ID.</td></tr>
+    </tbody>
+  </table>
+  <p>In both cases the first occurrence stays valid and the repeat is marked
+  <code>duplicate</code>, with its money fields cleared so a repeated transaction can never inflate
+  revenue.</p>
+  <p><b>The cost of this choice:</b> content matching could in principle flag two genuinely separate
+  sales that happen to agree on region, category, quantity, price, discount and date. That is a real
+  false-positive risk, so it is configurable — setting <code>DUPLICATE_DETECTION=id</code> restores
+  strict ID-only matching. The default honours the brief.</p>
+
+  <h3>7.3 Derived values</h3>
+<pre>gross_amount    = quantity × unit_price
+discount_amount = gross_amount × (discount_percent ÷ 100)
+net_amount      = gross_amount − discount_amount</pre>
+  <p>Computed only for valid rows, and rounded to two decimals when stored.</p>
+
+  <h3>7.4 The metrics computed per job</h3>
+  <div class="grid2">
+    <div class="box"><h4>Revenue</h4><p>Total (sum of net amounts), gross, and the breakdown by region and by product category with each one's share of the total.</p></div>
+    <div class="box"><h4>Averages</h4><p>Average order value, median transaction value, and the minimum and maximum.</p></div>
+    <div class="box"><h4>Spread</h4><p>Sample standard deviation, plus a <b>variance flag</b> raised when the coefficient of variation exceeds 1.0 — the signal that the average is a poor summary.</p></div>
+    <div class="box"><h4>Discount impact</h4><p>Total revenue given away to discounts, and what percentage of gross revenue that represents.</p></div>
+    <div class="box"><h4>Trends</h4><p>Revenue per day and per month, each with the percentage change against the previous period.</p></div>
+    <div class="box"><h4>Top transactions</h4><p>The five highest-value transactions, by net amount.</p></div>
+  </div>
+
+  <h3>7.5 The brief's sample file, row by row</h3>
+  <table class="tight">
+    <thead><tr><th style="width:16%">Row</th><th style="width:18%">Outcome</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><code>TXN-1001</code></td><td><span class="pill ok">valid</span></td><td>3 × $499.99 less 10% = <b>$1,349.97</b></td></tr>
+      <tr><td><code>TXN-1002</code></td><td><span class="pill ok">valid</span></td><td>12 × $15.50 = <b>$186.00</b></td></tr>
+      <tr><td><code>TXN-1003</code></td><td><span class="pill bad">invalid</span></td><td>Quantity is −2 → <code>NEGATIVE_VALUE</code></td></tr>
+      <tr><td><code>TXN-1004</code></td><td><span class="pill ok">valid</span></td><td>5 × $49.99 less 20% = <b>$199.96</b></td></tr>
+      <tr><td><code>TXN-1005</code></td><td><span class="pill dup">duplicate</span></td><td>Identical to TXN-1001 → <code>DUPLICATE_RECORD</code></td></tr>
+      <tr><td><code>TXN-1006</code></td><td><span class="pill bad">invalid</span></td><td>Unit price is <code>abc</code> → <code>NOT_A_NUMBER</code></td></tr>
+      <tr><td><code>TXN-1007</code></td><td><span class="pill bad">invalid</span></td><td>Date is 2099-01-01 → <code>FUTURE_DATE</code></td></tr>
+    </tbody>
+  </table>
+  <p><b>Totals:</b> 3 valid · 3 invalid · 1 duplicate. Revenue <b>$1,735.93</b>, gross
+  <b>$1,935.92</b>, discount impact <b>$199.99</b>, average order value <b>$578.64</b>, median
+  <b>$199.96</b>. These exact figures are asserted by the test suite, not merely documented.</p>
+</section>
+
+<!-- ============================ 8 ============================ -->
+<section class="page">
+  <h2>8 · API reference</h2>
+  <p class="lede">Every endpoint returns JSON. Errors use a flat <code>{"detail": "…"}</code> shape
+  with a correct status code. Authentication is a bearer token in the
+  <code>Authorization</code> header.</p>
+
+  <div class="note">A complete, interactive, always-current reference is generated from the code and
+  served at <b>http://localhost:8000/api/docs</b> while the API is running. You can call every
+  endpoint from that page.</div>
+
+  <h3>8.1 Authentication</h3>
+  <table class="tight">
+    <thead><tr><th style="width:10%">Method</th><th style="width:30%">Path</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>POST</td><td><code>/api/auth/signup</code></td><td>Body <code>{email, password}</code>; password at least 8 characters. Returns a token and the user. The first account becomes admin.</td></tr>
+      <tr><td>POST</td><td><code>/api/auth/login</code></td><td>Body <code>{email, password}</code>. Returns a token and the user.</td></tr>
+      <tr><td>GET</td><td><code>/api/auth/me</code></td><td>The caller's own account.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.2 Jobs</h3>
+  <table class="tight">
+    <thead><tr><th style="width:10%">Method</th><th style="width:34%">Path</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>POST</td><td><code>/api/jobs/upload</code></td><td>Multipart <code>file</code>, plus optional <code>auto_process</code>. Rate-limited per user.</td></tr>
+      <tr><td>GET</td><td><code>/api/jobs</code></td><td>The caller's jobs, newest first. Supports <code>limit</code>, <code>offset</code>, <code>status</code>.</td></tr>
+      <tr><td>GET</td><td><code>/api/jobs/{id}</code></td><td>One job. Returns 404 if it is not yours.</td></tr>
+      <tr><td>GET</td><td><code>/api/jobs/{id}/progress</code></td><td>Live counters — the polling fallback for the progress bar.</td></tr>
+      <tr><td>POST</td><td><code>/api/jobs/{id}/process</code></td><td>Queue the job for processing. 409 if it is already running.</td></tr>
+      <tr><td>POST</td><td><code>/api/jobs/{id}/reaggregate</code></td><td>Recompute metrics from the stored rows, without re-reading the file.</td></tr>
+      <tr><td>GET</td><td><code>/api/jobs/{id}/rows</code></td><td>Paginated rows. Supports <code>status</code>, free-text <code>q</code>, <code>limit</code>, <code>offset</code>.</td></tr>
+      <tr><td>GET</td><td><code>/api/jobs/{id}/report</code></td><td>All computed metrics for the job.</td></tr>
+      <tr><td>GET</td><td><code>/api/jobs/{id}/export</code></td><td>Annotated results as <code>format=csv</code> or <code>format=json</code>, streamed.</td></tr>
+      <tr><td>DELETE</td><td><code>/api/jobs/{id}</code></td><td>Deletes the job, its rows and its reports.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.3 Reports, admin and operations</h3>
+  <table class="tight">
+    <thead><tr><th style="width:10%">Method</th><th style="width:34%">Path</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>GET</td><td><code>/api/reports/by-region</code></td><td>Revenue-by-region across the caller's last N jobs — the brief's example query.</td></tr>
+      <tr><td>GET</td><td><code>/api/reports/overview</code></td><td>Cross-job totals, powering the dashboard's top tiles.</td></tr>
+      <tr><td>GET</td><td><code>/api/metrics</code></td><td>Job counts by status, failure rate, average row time, average job duration, rows processed. System-wide for admins, own-jobs for users.</td></tr>
+      <tr><td>GET</td><td><code>/api/health</code></td><td>Public. Reports API version and database reachability.</td></tr>
+      <tr><td>GET</td><td><code>/api/admin/users</code></td><td>Admin only. All registered accounts.</td></tr>
+      <tr><td>GET</td><td><code>/api/admin/jobs</code></td><td>Admin only. All jobs, with the owning user named.</td></tr>
+      <tr><td>WS</td><td><code>/ws/jobs/{id}?token=…</code></td><td>Live progress events: <code>status</code>, <code>progress</code>, <code>completed</code>, <code>failed</code>, <code>ping</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.4 A worked example</h3>
+<pre>TOKEN=$(curl -s -X POST localhost:8000/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"you@example.com","password":"password123"}' | jq -r .access_token)
+
+# Upload and process in one call
+curl -s -X POST localhost:8000/api/jobs/upload \
+  -H "Authorization: Bearer $TOKEN" \
+  -F file=@sample_data/sample_sales.csv -F auto_process=true
+
+# Read the metrics back
+curl -s localhost:8000/api/jobs/&lt;job-id&gt;/report -H "Authorization: Bearer $TOKEN" | jq .summary</pre>
+</section>
+
+<!-- ============================ 9 ============================ -->
+<section class="page">
+  <h2>9 · The dashboard</h2>
+  <p class="lede">Five screens. Every screenshot here is of the real application running against
+  the real backend, not a mockup.</p>
+
+  <figure>
+    <img src="images/login.png" alt="The sign-in screen">
+    <figcaption><b>Sign in.</b> Email and password, with inline validation and a link to registration.
+    The footer reports live API and database health, so a backend that is not running is visible
+    immediately rather than as a mysterious failure.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="images/dashboard.png" alt="The dashboard with upload card, overview tiles and the jobs table">
+    <figcaption><b>Dashboard.</b> Drag-and-drop upload with a "process on upload" toggle; cross-job
+    totals across every completed run; and the jobs table with status, row counts, and per-row
+    actions. A job that is queued or processing grows a live progress bar in place.</figcaption>
+  </figure>
+</section>
+
+<section class="page">
+  <figure class="shot-tall">
+    <img src="images/job-detail.png" alt="Job detail with summary tiles, charts, top transactions and the row explorer">
+    <figcaption><b>Job detail.</b> Row counts and financial summary as tiles; a high-variance warning
+    when the coefficient of variation exceeds the threshold; revenue by region and by category;
+    the revenue trend with a daily/monthly toggle; the top five transactions; and a filterable,
+    searchable explorer over every parsed row. Re-process, re-run aggregation and both export
+    formats are one click from here.</figcaption>
+  </figure>
+</section>
+
+<section class="page">
+  <figure>
+    <img src="images/admin.png" alt="The administration page with system metrics, users and all jobs">
+    <figcaption><b>Administration.</b> Visible only to accounts with the admin role, and refused by
+    the API as well as hidden in the UI. Shows live system metrics — job counts, failure rate,
+    average row time, average job duration, uptime — plus every registered user and every job across
+    all users with its owner named.</figcaption>
+  </figure>
+
+  <h3>9.1 Live progress, and what happens when the socket fails</h3>
+  <p>While a job runs, the dashboard opens a WebSocket to <code>/ws/jobs/{id}</code> and receives an
+  event roughly every 25 rows. The progress bar, row counter and valid/invalid/duplicate tallies all
+  update from those events.</p>
+  <p>WebSockets do not survive every corporate proxy. If the socket fails to open within three
+  seconds, or closes abnormally, the hook transparently switches to polling the progress endpoint
+  every two seconds and the indicator changes from "live" to "polling". The user still sees progress;
+  only the update frequency changes.</p>
+
+  <h3>9.2 Design and accessibility</h3>
+  <div class="grid2">
+    <div class="box"><h4>A real design system</h4><p>Hand-written CSS with custom properties for colour, spacing, radius and type. No UI kit, no Tailwind — four runtime dependencies in total.</p></div>
+    <div class="box"><h4>Light and dark</h4><p>Both themes are first-class and follow the operating system preference. The charts read the same tokens, so they re-colour with the rest of the page.</p></div>
+    <div class="box"><h4>Responsive</h4><p>Verified down to 390&nbsp;px with zero horizontal overflow on every route: cards stack, tables scroll within their own region, the nav collapses.</p></div>
+    <div class="box"><h4>Accessible</h4><p>Semantic landmarks, a skip link, labelled controls, visible focus rings, live regions for progress and toasts, and status conveyed by text as well as colour.</p></div>
+  </div>
+
+  <h3>9.3 Every async surface handles four states</h3>
+  <p>Loading, empty, error and loaded. An empty dashboard explains what to do next rather than showing
+  a blank table; a failed request shows what went wrong with a retry button rather than an
+  indefinite spinner.</p>
+</section>
+
+<!-- ============================ 10 ============================ -->
+<section class="page">
+  <h2>10 · Observability</h2>
+  <p class="lede">When something goes wrong at three in the morning, the question is always the same:
+  what actually happened? These are the answers the system can give.</p>
+
+  <h3>10.1 Structured logs</h3>
+  <p>Every log line is a single JSON object, written both to standard output and to
+  <code>backend/logs/app.log</code>. Machine-readable means greppable, and means a log shipper can
+  consume it without parsing rules.</p>
+
+<pre>{"event": "job.completed", "job_id": "7912d1d8-…", "total_rows": 10000,
+ "valid_rows": 9383, "invalid_rows": 407, "duplicate_rows": 210,
+ "duration_ms": 3751.4, "avg_row_ms": 0.375,
+ "correlation_id": "fc89e79a-…", "level": "info",
+ "timestamp": "2026-10-02T11:04:12.882Z"}</pre>
+
+  <h3>10.2 Correlation IDs</h3>
+  <p>This is the part that makes the logs genuinely useful. Each job is stamped with a correlation ID
+  at upload. Every subsequent log line — from the queue, from the worker threads, from aggregation —
+  carries that same ID. Separately, each HTTP request gets its own ID, returned in the
+  <code>X-Correlation-ID</code> response header and accepted from the caller if supplied.</p>
+  <p>The job's correlation ID is shown on the job detail page, so a user reporting a problem can read
+  it off the screen, and you can retrieve the entire history of that job with one command:</p>
+<pre>grep fc89e79a backend/logs/app.log | jq .</pre>
+
+  <h3>10.3 What gets logged</h3>
+  <table class="tight">
+    <thead><tr><th style="width:30%">Event</th><th style="width:12%">Level</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td><code>http.request</code></td><td>info / warn</td><td>Every API call, with method, path, status and duration. Warn at 400 and above.</td></tr>
+      <tr><td><code>auth.signup</code> · <code>auth.login</code></td><td>info</td><td>Account created, session started.</td></tr>
+      <tr><td><code>auth.login_failed</code></td><td>warn</td><td>Bad credentials. Passwords are never logged.</td></tr>
+      <tr><td><code>upload.received</code></td><td>info</td><td>File accepted, with size and the new correlation ID.</td></tr>
+      <tr><td><code>rate_limit.exceeded</code></td><td>warn</td><td>A user hit the upload throttle.</td></tr>
+      <tr><td><code>job.queued</code> · <code>job.started</code></td><td>info</td><td>Lifecycle transitions.</td></tr>
+      <tr><td><code>row.invalid</code></td><td>warn</td><td>A row failed validation, with its codes.</td></tr>
+      <tr><td><code>job.completed</code></td><td>info</td><td>Final counts and timing.</td></tr>
+      <tr><td><code>job.failed</code></td><td>error</td><td>The job could not finish, with the reason.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.4 Metrics</h3>
+  <p><code>GET /api/metrics</code> answers the operational questions directly: how many jobs exist and
+  in what states, what fraction of them failed, how long an average row takes to process, how long an
+  average job takes, and how many rows have been processed in total. Administrators see the whole
+  system; ordinary users see their own jobs. The Administration page renders all of it.</p>
+</section>
+
+<!-- ============================ 11 ============================ -->
+<section class="page">
+  <h2>11 · Security posture</h2>
+  <p class="lede">What is defended, and how.</p>
+
+  <h3>11.1 Passwords and tokens</h3>
+  <ul>
+    <li>Passwords are hashed with <b>bcrypt</b> and a per-password salt. Plaintext is never stored and never logged. A test asserts the stored value is a bcrypt hash rather than the password.</li>
+    <li>bcrypt silently ignores anything past 72 bytes, which would quietly weaken a long passphrase. The code truncates deliberately at that boundary rather than pretending the tail counted.</li>
+    <li>Sessions are stateless <b>JWTs</b> signed with HS256, carrying the user id and role, with an expiry that is enforced. A token belonging to a deleted user is rejected — proven by a test.</li>
+  </ul>
+
+  <h3>11.2 Tenant isolation</h3>
+  <p>Every query for a job, a row or a report is scoped by <code>user_id</code>. Administrators are
+  the single, explicit exception.</p>
+  <div class="note"><b>Requesting another user's job returns 404, not 403.</b> A 403 confirms the
+  resource exists, which lets an attacker enumerate valid job IDs. A 404 reveals nothing. The cost is
+  marginally less helpful feedback to a legitimate user who mistyped a URL — a trade worth making.
+  Every ownership-sensitive endpoint has a test asserting this.</div>
+
+  <h3>11.3 Upload safety</h3>
+  <table class="tight">
+    <thead><tr><th style="width:32%">Risk</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td>Path traversal via filename</td><td>The client's filename is never used as a path. Files are stored under a server-generated UUID; the original name is kept as data only.</td></tr>
+      <tr><td>Disk exhaustion</td><td>The size cap is enforced <i>while</i> streaming to disk, and the partial file is deleted the moment the limit is crossed.</td></tr>
+      <tr><td>Upload flooding</td><td>A per-user token-bucket limiter returns 429 with a <code>Retry-After</code> header.</td></tr>
+      <tr><td>Unexpected file types</td><td>An extension allow-list, checked before anything is written.</td></tr>
+      <tr><td>Malicious content crashing the pipeline</td><td>Every parse and conversion is guarded; bad data becomes a flagged row, never an exception that escapes.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>11.4 At the edges</h3>
+  <ul>
+    <li>CORS is restricted to a configured origin list rather than a wildcard.</li>
+    <li>Unhandled exceptions return a generic message — no tracebacks or internal paths reach the client.</li>
+    <li>The WebSocket validates its token <b>before</b> accepting the connection, and refuses with a 4401 close code. Browsers cannot set headers on a WebSocket handshake, so the token travels as a query parameter; this is noted because it means the token can appear in proxy logs, which is the known trade of that approach.</li>
+    <li>SQL is built entirely through SQLAlchemy's expression layer — no string-concatenated queries.</li>
+  </ul>
+
+  <h3>11.5 What production would still need</h3>
+  <p>Stated plainly rather than glossed over: a real secret in <code>JWT_SECRET</code> (the default is
+  a development placeholder and the application should refuse to start with it in production), HTTPS
+  termination, refresh-token rotation, account lockout after repeated failed logins, and a rate
+  limiter backed by shared storage rather than process memory.</p>
+</section>
+
+<!-- ============================ 12 ============================ -->
+<section class="page">
+  <h2>12 · Testing &amp; evidence</h2>
+  <p class="lede">Every requirement in the brief is backed by something executable. The claims in this
+  document can be re-checked with one command.</p>
+
+  <h3>12.1 The suite</h3>
+  <table class="tight">
+    <thead><tr><th style="width:30%">File</th><th style="width:10%">Tests</th><th>What it proves</th></tr></thead>
+    <tbody>
+      <tr><td><code>test_validation.py</code></td><td>35</td><td>Every validation rule and error code; CSV, JSON and NDJSON parsing; byte-order marks; short rows; unreadable files.</td></tr>
+      <tr><td><code>test_metrics.py</code></td><td>14</td><td>Mean, median, sample standard deviation and percentage change against hand-computed values; breakdown shares; trend calculations; the empty case.</td></tr>
+      <tr><td><code>test_pipeline.py</code></td><td>16</td><td>A full job run; the sample file's exact outcome; re-processing being idempotent; a bad file failing the job cleanly.</td></tr>
+      <tr><td><code>test_concurrency.py</code></td><td>3</td><td>The worker pool beating a sequential baseline on the clock; retry succeeding; retry exhaustion landing as <code>PROCESSING_ERROR</code>.</td></tr>
+      <tr><td><code>test_queue.py</code></td><td>7</td><td>Jobs dispatched, the queue draining, and a failing handler not killing the dispatcher.</td></tr>
+      <tr><td><code>test_auth_api.py</code></td><td>13</td><td>Signup, login, hashing, expiry, deleted-user tokens, and the admin guard.</td></tr>
+      <tr><td><code>test_jobs_api.py</code></td><td>21</td><td>The whole lifecycle over HTTP, tenant isolation on every endpoint, exports, rate limiting, and both duplicate modes.</td></tr>
+      <tr><td><code>test_reports_api.py</code></td><td>8</td><td>Cross-job reporting, scoping, and the metrics endpoint including failure rate.</td></tr>
+      <tr><td><code>test_realtime.py</code></td><td>4</td><td>WebSocket authentication, rejection of another user's job, and the full event sequence through to completion.</td></tr>
+      <tr><td><code>test_scale.py</code></td><td>1</td><td>10,000 rows end to end: upload, processing, report, paginated reads and export.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>12.2 The result</h3>
+<pre>$ ./scripts/test.sh --slow
+138 passed in 24.53s
+
+Statement coverage: 95%
+  pipeline.py    100%     metrics.py     100%     queue.py       100%
+  models.py      100%     schemas.py     100%     auth.py        100%
+  validation.py   94%     jobs.py         94%     reports.py      96%</pre>
+
+  <h3>12.3 Verified in a real browser, not just in tests</h3>
+  <p>The dashboard was driven end to end in a real browser against the real backend. Confirmed by
+  observation rather than assumption:</p>
+  <ul>
+    <li>Registration, the first account receiving the admin role, and sign-in.</li>
+    <li>Uploading the brief's sample file and reading <b>3 / 3 / 1</b> with revenue <b>$1,735.93</b> on screen.</li>
+    <li>Uploading 10,000 rows and watching a genuine WebSocket stream progress frames — "2,000 / 10,000 rows · 20% · live" — through to completion in about four seconds.</li>
+    <li>Error chips rendering the correct codes on each invalid row.</li>
+    <li>Downloading the annotated CSV export and checking its contents.</li>
+    <li>A second user seeing an empty dashboard, no Administration link, "Job not found" on a direct link to the first user's job, and a clear refusal on the admin route.</li>
+    <li>Zero horizontal overflow at 390&nbsp;px, and dark mode re-colouring the charts.</li>
+    <li>Zero JavaScript console errors across the entire session.</li>
+  </ul>
+
+  <h3>12.4 Verified from a clean clone</h3>
+  <p>The repository was cloned to a fresh directory and <code>./scripts/setup.sh</code> run from
+  scratch. It provisioned the environment and all 138 tests passed, with no manual steps. This
+  matters because a handover that only works on the machine it was built on is not a handover.</p>
+
+  <h3>12.5 Continuous integration</h3>
+  <p><code>.github/workflows/ci.yml</code> runs three jobs on every push: the backend suite with
+  coverage, the frontend type-check and production build, and both Docker image builds.</p>
+</section>
+
+<!-- ============================ 13 ============================ -->
+<section class="page">
+  <h2>13 · Design decisions &amp; tradeoffs</h2>
+  <p class="lede">Every one of these had a defensible alternative. What follows is the choice made and
+  what it costs — because a decision stated without its price is not a decision, it is a preference.</p>
+
+  <h3>SQLite rather than PostgreSQL</h3>
+  <p><b>Chosen because</b> it removes every setup step: clone, run two scripts, working dashboard.
+  No daemon, no credentials, no container just to read a table.<br>
+  <b>It costs</b> a single writer at a time, which shaped the concurrency model — and no network
+  access to the database.<br>
+  <b>Escape hatch:</b> change <code>DATABASE_URL</code>. Nothing else in the code assumes SQLite.</p>
+
+  <h3>Threads rather than async or multiprocessing</h3>
+  <p><b>Chosen because</b> the per-row cost is I/O-shaped and the real work is short. Threads give
+  genuine speedup without process-spawn cost, without pickling, and without rewriting the database
+  layer as async.<br>
+  <b>It costs</b> no benefit if the work ever becomes CPU-bound.<br>
+  <b>Escape hatch:</b> swapping in <code>ProcessPoolExecutor</code> touches one module.</p>
+
+  <h3>Jobs serialized, rows parallel</h3>
+  <p><b>Chosen because</b> SQLite permits one writer, so parallel jobs would contend rather than
+  scale, while parallel rows deliver the concurrency the brief asks for.<br>
+  <b>It costs</b> throughput when many users upload simultaneously — jobs queue behind each other.<br>
+  <b>Escape hatch:</b> the queue interface is deliberately the same shape as a distributed broker's.</p>
+
+  <h3>An in-process queue and event hub rather than Redis</h3>
+  <p><b>Chosen because</b> the brief asks for a self-contained system, and Redis means a service to
+  install, run and explain.<br>
+  <b>It costs</b> multi-process workers and durability across restarts.<br>
+  <b>Escape hatch:</b> both sit behind narrow interfaces — <code>JobQueue</code> and
+  <code>EventHub</code> — specifically so they can be replaced without touching the routers or the
+  pipeline.</p>
+
+  <h3>Duplicate detection outside the worker threads</h3>
+  <p><b>Chosen because</b> workers finish out of order, so detecting duplicates inside them would make
+  "which row is the original" depend on thread scheduling. The same file could produce different
+  reports on different runs.<br>
+  <b>It costs</b> a little extra code and a serial pass over each completed batch.<br>
+  <b>What it buys:</b> reproducible output, which for an analytics tool is non-negotiable.</p>
+
+  <h3>Honouring both duplicate signals</h3>
+  <p><b>Chosen because</b> the brief's stated rule and the brief's own sample data disagree, and
+  satisfying only the literal rule would fail the stated acceptance criteria.<br>
+  <b>It costs</b> a genuine false-positive risk on identical-but-distinct sales.<br>
+  <b>Escape hatch:</b> <code>DUPLICATE_DETECTION=id</code>. The conflict is documented rather than
+  silently resolved.</p>
+
+  <h3>Reports stored per metric family, not as one blob</h3>
+  <p><b>Chosen because</b> the brief's example query — revenue-by-region across recent jobs — then
+  becomes one indexed join instead of deserialising every metric for every job.<br>
+  <b>It costs</b> six small rows per job instead of one.<br>
+  <b>Bonus:</b> re-aggregation becomes an upsert rather than a rewrite.</p>
+
+  <h3>Invalid rows stored, not discarded</h3>
+  <p><b>Chosen because</b> the stored rows <i>are</i> the error report the brief asks for, and the
+  annotated export is simply a dump of them.<br>
+  <b>It costs</b> storage proportional to the bad data.<br>
+  <b>What it buys:</b> a user can filter, search and export exactly what went wrong, with the
+  original values preserved alongside the error codes.</p>
+
+  <h3>404 rather than 403 for other users' resources</h3>
+  <p><b>Chosen because</b> a 403 confirms a resource exists, which enables ID enumeration.<br>
+  <b>It costs</b> slightly less helpful feedback on a mistyped URL.</p>
+
+  <h3>WebSockets with a polling fallback</h3>
+  <p><b>Chosen because</b> proxies and corporate networks drop WebSocket upgrades, and progress that
+  silently stalls is worse than progress that updates slowly.<br>
+  <b>It costs</b> two code paths to maintain instead of one.</p>
+
+  <h3>A hand-written CSS design system rather than a UI kit</h3>
+  <p><b>Chosen because</b> four runtime dependencies total, full control over the result, and no
+  framework idioms leaking into the markup.<br>
+  <b>It costs</b> more up-front work than importing a component library.</p>
+
+  <h3>A written specification before any code</h3>
+  <p><b>Chosen because</b> it is what made parallel work safe — three streams could proceed at once
+  against pinned contracts, and integration was running the suite rather than rewriting.<br>
+  <b>It costs</b> time before the first line of implementation.</p>
+</section>
+
+<!-- ============================ 14 ============================ -->
+<section class="page">
+  <h2>14 · How AI tools were used</h2>
+  <p class="lede">The brief asks for an explanation of how AI tools were used to arrive at the
+  solution. This section answers that honestly — including where the model was wrong and how that
+  was caught.</p>
+
+  <h3>14.1 The tool and the posture</h3>
+  <p>The project was built with <b>Claude Code (Opus)</b> operating as the engineer of record under
+  human direction — not as autocomplete, and not as an oracle. The working assumption throughout was
+  that model output is a <i>proposal</i> which earns its place by passing a check, not by sounding
+  plausible.</p>
+
+  <h3>14.2 Specification before implementation</h3>
+  <p>The first artefact was not code. The brief was turned into <code>SPEC.md</code>: validation rules
+  with named error codes, the data model with the reasoning for each index, the complete API surface,
+  and numeric acceptance criteria for the sample file. Everything afterwards was built against that
+  document rather than against a fading memory of a PDF.</p>
+  <p>This had a concrete payoff beyond tidiness — it is what made the next step safe.</p>
+
+  <h3>14.3 Parallel agents against pinned contracts</h3>
+  <p>Once the foundation existed — settings, models, schemas, security, logging — and the module
+  interfaces were pinned down to exact function signatures, the work was split across three
+  concurrent streams:</p>
+  <table class="tight">
+    <thead><tr><th style="width:30%">Stream</th><th>Scope</th></tr></thead>
+    <tbody>
+      <tr><td><b>Processing agent</b></td><td>Validation, metrics, the worker pool, the queue, the event hub, and their unit tests.</td></tr>
+      <tr><td><b>Frontend agent</b></td><td>The entire React application, built against the API contract in the specification.</td></tr>
+      <tr><td><b>Main session</b></td><td>The API layer, integration tests, review, verification and this document.</td></tr>
+    </tbody>
+  </table>
+  <p>Precise contracts are what made the three streams composable. When they met, integration was a
+  matter of running the suite — not of rewriting interfaces that had drifted. Each agent was given an
+  explicit scope boundary and told not to commit, so the work could be reviewed before it landed.</p>
+
+  <h3>14.4 Where the model was wrong — and how it was caught</h3>
+  <p>This is the part worth reading. Three substantive errors surfaced, all caught by verification
+  rather than by inspection:</p>
+  <table class="tight">
+    <thead><tr><th style="width:26%">What went wrong</th><th style="width:30%">How it surfaced</th><th>Resolution</th></tr></thead>
+    <tbody>
+      <tr><td><b>A real bug.</b> The rows endpoint tried to validate an ORM object whose <code>errors</code> column is JSON text, so every row query failed.</td>
+        <td>Integration tests failed the moment the two halves met.</td>
+        <td>Decode the JSON before constructing the response model.</td></tr>
+      <tr><td><b>Bad arithmetic in the expected values.</b> Hand-computed gross revenue and discount impact for the sample file were simply wrong.</td>
+        <td>Tests failed — but the <i>code</i> was right and the <i>test</i> was wrong.</td>
+        <td>Recomputed independently, confirmed the pipeline, corrected the expectations and the README.</td></tr>
+      <tr><td><b>A proposal that had to be refused.</b> An agent, unable to reconcile the brief's duplicate rule with its sample data, proposed editing the sample file so its implementation would pass.</td>
+        <td>Caught on review of the agent's report.</td>
+        <td>Rejected — the sample data is the requirement, not a variable. The underlying contradiction was analysed and both duplicate signals implemented instead.</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b>The third case is the instructive one.</b> An agent reported a clean suite and a
+  tidy explanation for why the brief's own acceptance numbers could not be met. Taking that at face
+  value would have produced a system that passed its own tests while failing the actual requirement.
+  Delegation does not transfer accountability.</div>
+
+  <h3>14.5 Verification, not assertion</h3>
+  <p>Every claim in this handbook is backed by something that can be re-run:</p>
+  <ul>
+    <li><b>138 automated tests</b> covering each validation rule, the hand-computed figures, tenant isolation on every endpoint, retry exhaustion, rate limiting, WebSocket event ordering, and a full 10,000-row run.</li>
+    <li><b>A measured concurrency assertion</b> with a hard wall-clock bound, so a silent regression to sequential processing fails the build.</li>
+    <li><b>Real browser verification</b> — the UI was driven end to end against the real backend, with live WebSocket frames observed on the wire, not assumed from a clean compile.</li>
+    <li><b>A clean-clone rebuild</b> — the repository was cloned fresh and set up from scratch to confirm the instructions in this document actually work.</li>
+  </ul>
+
+  <h3>14.6 Where human judgment stayed in charge</h3>
+  <p>The stack choice, the two-level concurrency model, the decision to detect duplicates outside the
+  worker threads, returning 404 instead of 403, the reading of the duplicate-rule contradiction, and
+  the line between what to build and what to document as a limit — these were directed and reviewed,
+  not generated. The model's first instinct was not always right, and the tradeoffs recorded in
+  Section 13 are the ones that survived scrutiny.</p>
+
+  <h3>14.7 The honest summary</h3>
+  <p>AI tooling compressed the timeline substantially — particularly on breadth, where three
+  workstreams advanced at once, and on the unglamorous mass of tests, types and documentation that
+  usually gets cut first. It did not remove the need for engineering judgment. What it changed is
+  where that judgment gets spent: less on typing, more on specifying precisely, reviewing sceptically,
+  and insisting that every claim be checkable.</p>
+</section>
+
+<!-- ============================ 15 ============================ -->
+<section class="page">
+  <h2>15 · Known limits &amp; next steps</h2>
+  <p class="lede">Stated plainly. A handover that only lists strengths is not a handover.</p>
+
+  <h3>15.1 Current limits</h3>
+  <table class="tight">
+    <thead><tr><th style="width:32%">Limit</th><th>Consequence, and the workaround</th></tr></thead>
+    <tbody>
+      <tr><td><b>Single process</b></td><td>Job state lives in memory. A restart mid-job leaves that job showing <code>processing</code>. Re-triggering it is safe — processing is idempotent and clears prior rows first. A startup sweep that re-queues interrupted jobs would close this.</td></tr>
+      <tr><td><b>Rate limiting is per process</b></td><td>Behind multiple instances the effective limit multiplies. Needs shared storage to be exact.</td></tr>
+      <tr><td><b>No database migrations</b></td><td>The schema is created directly from the models. Fine for a greenfield database; Alembic would be required once there is data worth preserving.</td></tr>
+      <tr><td><b>Content-based duplicates can false-positive</b></td><td>Two genuinely distinct but identical sales would be flagged. Configurable via <code>DUPLICATE_DETECTION</code>, and documented rather than hidden.</td></tr>
+      <tr><td><b>SQLite write throughput</b></td><td>One writer at a time caps concurrent job throughput. Moving to PostgreSQL is a connection-string change plus removing the job serialization.</td></tr>
+      <tr><td><b>WebSocket token in the query string</b></td><td>Browsers cannot set headers on a WebSocket handshake, so the token may appear in proxy logs. A short-lived ticket exchanged for the socket would be the production fix.</td></tr>
+      <tr><td><b>The cross-job region report has no screen</b></td><td><code>/api/reports/by-region</code> is implemented and tested but surfaced only via the API; the dashboard shows cross-job totals instead.</td></tr>
+      <tr><td><b>No frontend unit tests</b></td><td>The UI is covered by type-checking, a production build and real-browser verification, but not by component tests.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>15.2 What I would do next, in order</h3>
+  <ol>
+    <li><b>Re-queue interrupted jobs on startup.</b> Small change, removes the most visible rough edge.</li>
+    <li><b>Refuse to boot with the default <code>JWT_SECRET</code> outside development.</b> Cheap, and closes the most dangerous misconfiguration.</li>
+    <li><b>Component tests for the dashboard.</b> Vitest and Testing Library on the progress hook and the row explorer first — the two pieces with real logic.</li>
+    <li><b>Alembic migrations.</b> Before any deployment that keeps data.</li>
+    <li><b>PostgreSQL plus a real broker.</b> Only when concurrent job throughput actually becomes the constraint — both seams are already cut for it.</li>
+    <li><b>Scheduled recurring reports.</b> The brief lists this as optional; the aggregation path is already separate and callable, so it is mostly a scheduler and an email template.</li>
+  </ol>
+
+  <h3>15.3 Where to start reading the code</h3>
+  <ol>
+    <li><code>SPEC.md</code> — what the system is supposed to do.</li>
+    <li><code>backend/app/processing/pipeline.py</code> — how a job actually runs.</li>
+    <li><code>backend/app/processing/validation.py</code> — every rule, in one place.</li>
+    <li><code>backend/app/routers/jobs.py</code> — the API surface users touch most.</li>
+    <li><code>frontend/src/hooks/useJobProgress.ts</code> — the WebSocket-with-fallback logic.</li>
+    <li><code>backend/tests/test_jobs_api.py</code> — the behaviour, described as assertions.</li>
+  </ol>
+</section>
+
+<!-- ============================ APPENDICES ============================ -->
+<section class="page">
+  <h2>Appendix A · Configuration reference</h2>
+  <p class="lede">Copy <code>backend/.env.example</code> to <code>backend/.env</code> and edit. Every
+  setting has a working default — the system runs with no configuration at all.</p>
+
+  <table class="tight">
+    <thead><tr><th style="width:34%">Variable</th><th style="width:20%">Default</th><th>What it controls</th></tr></thead>
+    <tbody>
+      <tr><td><code>JWT_SECRET</code></td><td>dev placeholder</td><td><b>Change this in production.</b> Signs every session token.</td></tr>
+      <tr><td><code>JWT_EXPIRE_MINUTES</code></td><td>1440</td><td>Session lifetime — 24 hours by default.</td></tr>
+      <tr><td><code>DATABASE_URL</code></td><td>local SQLite file</td><td>Any SQLAlchemy URL. Point at PostgreSQL to move databases.</td></tr>
+      <tr><td><code>WORKER_POOL_SIZE</code></td><td>8</td><td>Row workers per job.</td></tr>
+      <tr><td><code>ROW_PROCESSING_DELAY_MS</code></td><td>2</td><td>The simulated per-row cost the brief asks for. Set to 0 for maximum speed.</td></tr>
+      <tr><td><code>ROW_MAX_RETRIES</code></td><td>2</td><td>Retries before a row is demoted to invalid.</td></tr>
+      <tr><td><code>ROW_RETRY_BACKOFF_MS</code></td><td>10</td><td>Pause between retries.</td></tr>
+      <tr><td><code>PROGRESS_EMIT_EVERY</code></td><td>25</td><td>Rows between progress events. Lower is smoother, chattier.</td></tr>
+      <tr><td><code>DB_INSERT_CHUNK_SIZE</code></td><td>1000</td><td>Rows per bulk insert.</td></tr>
+      <tr><td><code>VARIANCE_CV_THRESHOLD</code></td><td>1.0</td><td>Coefficient of variation above which high variance is flagged.</td></tr>
+      <tr><td><code>DUPLICATE_DETECTION</code></td><td><code>id_and_content</code></td><td><code>id</code> matches repeated IDs only; the default also catches re-submitted rows.</td></tr>
+      <tr><td><code>MAX_UPLOAD_MB</code></td><td>50</td><td>Upload size cap.</td></tr>
+      <tr><td><code>UPLOAD_RATE_LIMIT</code></td><td>20</td><td>Uploads allowed per window, per user.</td></tr>
+      <tr><td><code>UPLOAD_RATE_WINDOW_SECONDS</code></td><td>60</td><td>The window for the above.</td></tr>
+      <tr><td><code>CORS_ORIGINS</code></td><td>localhost dev ports</td><td>Comma-separated allowed origins.</td></tr>
+      <tr><td><code>LOG_LEVEL</code></td><td>INFO</td><td>DEBUG, INFO, WARNING or ERROR.</td></tr>
+      <tr><td><code>LOG_JSON</code></td><td>true</td><td>Set false for human-readable console logs while developing.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="page">
+  <h2>Appendix B · Troubleshooting</h2>
+
+  <table class="tight">
+    <thead><tr><th style="width:36%">Symptom</th><th>Cause and fix</th></tr></thead>
+    <tbody>
+      <tr><td><b>The footer says the API is unreachable</b></td>
+        <td>The backend is not running or is on another port. Check <code>curl localhost:8000/api/health</code>. The dashboard proxies <code>/api</code> to port 8000 — see <code>frontend/vite.config.ts</code>.</td></tr>
+      <tr><td><b><code>setup.sh</code> says ensurepip is unavailable</b></td>
+        <td>Expected on Debian and Ubuntu, which split <code>venv</code> from <code>ensurepip</code>. The script detects this and bootstraps pip itself; the message is informational. If it still fails: <code>sudo apt install python3-venv</code>.</td></tr>
+      <tr><td><b>Port 8000 or 5173 already in use</b></td>
+        <td><code>lsof -ti:8000 | xargs kill</code>, or pass <code>--port</code> to uvicorn and Vite.</td></tr>
+      <tr><td><b>A job is stuck in <code>processing</code></b></td>
+        <td>Almost certainly the API restarted mid-job (see Section 15.1). Press <b>Re-process</b> — it is idempotent and clears the previous rows first.</td></tr>
+      <tr><td><b>The progress bar says "polling" rather than "live"</b></td>
+        <td>Working as designed. The WebSocket could not be established, so it fell back to polling. Progress is still accurate, just updated every two seconds.</td></tr>
+      <tr><td><b>Uploads return 429</b></td>
+        <td>The per-user rate limit. Wait for the <code>Retry-After</code> interval, or raise <code>UPLOAD_RATE_LIMIT</code>.</td></tr>
+      <tr><td><b>A job failed immediately</b></td>
+        <td>The file could not be parsed at all — empty, no header, or invalid JSON. The job's error message says which. The job detail page shows it.</td></tr>
+      <tr><td><b>More duplicates than expected</b></td>
+        <td>Content-based detection is on by default (Section 7.2). Set <code>DUPLICATE_DETECTION=id</code> for strict ID-only matching.</td></tr>
+      <tr><td><b>The Administration page refuses me</b></td>
+        <td>Only the first registered account is an administrator. Promote another account by setting its <code>role</code> to <code>admin</code> in the <code>users</code> table.</td></tr>
+      <tr><td><b>Tests fail on a slow or loaded machine</b></td>
+        <td>The concurrency test asserts a wall-clock bound. Run <code>./scripts/test.sh</code> without <code>--slow</code> to skip timing-sensitive tests.</td></tr>
+      <tr><td><b>I want to start completely fresh</b></td>
+        <td><code>rm -rf backend/data backend/logs</code> — the schema and directories are recreated on the next start. This deletes all accounts and jobs.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Getting help from the system itself</h3>
+<pre># Is the API healthy?
+curl -s localhost:8000/api/health | jq .
+
+# What has it been doing?
+tail -f backend/logs/app.log | jq .
+
+# Trace one job across every thread that touched it
+grep &lt;correlation-id&gt; backend/logs/app.log | jq .
+
+# What do the operational numbers look like?
+curl -s localhost:8000/api/metrics -H "Authorization: Bearer $TOKEN" | jq .</pre>
+
+  <div style="margin-top:14mm; padding-top:5mm; border-top:1px solid var(--rule); font-size:9pt; color:var(--muted);">
+    <p style="margin:0"><b>End of handbook.</b> The companion documents are <code>README.md</code>
+    (quick reference), <code>SPEC.md</code> (the contract the code was built against) and
+    <code>docs/ARCHITECTURE.md</code> (deeper architectural notes). The interactive API reference is
+    generated from the code and served at <code>/api/docs</code> whenever the backend is running.</p>
+  </div>
+</section>
+
+</body>
+</html>

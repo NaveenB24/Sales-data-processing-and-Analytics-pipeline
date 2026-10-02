@@ -209,11 +209,16 @@ Generate load-test fixtures:
 
 ---
 
-## Architecture
+## Documentation
 
-See **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for the full diagram, the concurrency
-model, index rationale and security posture. **[SPEC.md](SPEC.md)** is the written contract
-the implementation was built against.
+| Document | What it is |
+|---|---|
+| **[docs/handoff.pdf](docs/handoff.pdf)** | **The project handbook** — a 39-page walkthrough written for someone with no prior context: how to run it, the repository map, architecture, business rules, API, UI, testing evidence, design tradeoffs, how AI tooling was used, and troubleshooting. Start here. |
+| [SPEC.md](SPEC.md) | The written contract the code was built against. |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Deeper architectural notes: diagram, concurrency model, index rationale, security posture. |
+| `/api/docs` | Interactive API reference, generated from the code, live while the backend runs. |
+
+The handbook is generated from `docs/handoff.html`; edit that and re-print to PDF to regenerate it.
 
 ---
 
