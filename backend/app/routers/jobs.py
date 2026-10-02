@@ -264,11 +264,27 @@ def list_rows(
         .offset(offset)
     ).all()
 
-    items = []
-    for row in rows:
-        item = TransactionOut.model_validate(row, from_attributes=True)
-        item.errors = _parse_errors(row.errors)  # type: ignore[assignment]
-        items.append(item)
+    # `errors` is a JSON text column, so the ORM object cannot be validated
+    # wholesale — the list has to be decoded first.
+    items = [
+        TransactionOut(
+            id=row.id,
+            row_number=row.row_number,
+            transaction_id=row.transaction_id,
+            region=row.region,
+            product_category=row.product_category,
+            quantity=row.quantity,
+            unit_price=row.unit_price,
+            discount_percent=row.discount_percent,
+            transaction_date=row.transaction_date,
+            gross_amount=row.gross_amount,
+            discount_amount=row.discount_amount,
+            net_amount=row.net_amount,
+            status=row.status,
+            errors=_parse_errors(row.errors),
+        )
+        for row in rows
+    ]
     return TransactionListOut(items=items, total=total)
 
 

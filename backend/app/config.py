@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     progress_emit_every: int = 25
     db_insert_chunk_size: int = 1000
     variance_cv_threshold: float = 1.0
+    # "id" matches repeated transaction_ids only; "id_and_content" also flags a
+    # sale re-submitted under a fresh id (identical on every other field).
+    duplicate_detection: str = "id_and_content"
 
     # --- limits --------------------------------------------------------
     max_upload_mb: int = 50

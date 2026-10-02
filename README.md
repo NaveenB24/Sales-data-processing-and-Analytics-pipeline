@@ -125,11 +125,20 @@ failure rate, average row-processing time and average job duration.
 | `discount_percent` | optional (blank ⇒ `0`), numeric, `0–100` | `NOT_A_NUMBER` · `OUT_OF_RANGE` |
 | `transaction_date` | required, parseable, not in the future | `MISSING_FIELD` · `INVALID_DATE` · `FUTURE_DATE` |
 | repeat `transaction_id` | first occurrence wins | `DUPLICATE_ID` |
+| repeat of an earlier row under a new id | first occurrence wins | `DUPLICATE_RECORD` |
 | unreadable line | never aborts the run | `MALFORMED_ROW` |
 | worker exhausted retries | row demoted, job continues | `PROCESSING_ERROR` |
 
 Duplicates have their money fields nulled, so a repeated transaction can never inflate
 revenue.
+
+**Two duplicate signals, and why.** The brief asks for duplicate `transaction_id`s to be
+flagged — but its own sample file calls `TXN-1005` a duplicate of `TXN-1001`, and those two
+ids are *different*; only the contents repeat. Implementing only the stated rule would fail
+the brief's own acceptance note, so both are implemented: a repeated id (`DUPLICATE_ID`) and
+a repeated row under a fresh id (`DUPLICATE_RECORD`). Content matching could in principle
+collide with two genuinely separate sales agreeing on every field, so it is configurable —
+`DUPLICATE_DETECTION=id` restores id-only matching.
 
 ### The brief's sample file
 
@@ -141,11 +150,11 @@ revenue.
 | TXN-1002 | valid | 12 × 15.50 = **186.00** |
 | TXN-1003 | invalid | negative quantity |
 | TXN-1004 | valid | 5 × 49.99 − 20% = **199.96** |
-| TXN-1005 | duplicate | repeat of TXN-1001 |
+| TXN-1005 | duplicate | identical to TXN-1001 on every field but the id |
 | TXN-1006 | invalid | `unit_price` is `abc` |
 | TXN-1007 | invalid | date `2099-01-01` is in the future |
 
-Total revenue **1 735.93** · AOV **578.64** · median **199.96** · discount impact **100.49**.
+Total revenue **1 735.93** · gross **1 935.92** · AOV **578.64** · median **199.96** · discount impact **199.99**.
 This is asserted as a test, not just documented.
 
 ---
@@ -189,6 +198,7 @@ Copy `backend/.env.example` to `backend/.env`. Everything has a working default.
 | `MAX_UPLOAD_MB` | `50` | upload size cap |
 | `UPLOAD_RATE_LIMIT` / `_WINDOW_SECONDS` | `20` / `60` | per-user upload throttle |
 | `VARIANCE_CV_THRESHOLD` | `1.0` | CV above which variance is flagged |
+| `DUPLICATE_DETECTION` | `id_and_content` | `id` matches repeated ids only |
 | `LOG_LEVEL` / `LOG_JSON` | `INFO` / `true` | logging |
 
 Generate load-test fixtures:

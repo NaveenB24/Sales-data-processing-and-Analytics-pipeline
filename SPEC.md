@@ -28,10 +28,21 @@ case-insensitive and whitespace-trimmed.
 ### 2.2 Row validation
 A row is assigned exactly one `status`:
 
-- `duplicate` — `transaction_id` already seen earlier **in the same job**. Takes
-  precedence over field errors only after field validation passes; a row that is
-  both malformed and a repeat is reported as `invalid` with the duplicate error
-  also listed. First occurrence stays `valid`.
+- `duplicate` — the row repeats an earlier row **in the same job**, by either signal
+  below. Takes precedence over field errors only after field validation passes; a row
+  that is both malformed and a repeat is reported as `invalid` with the duplicate error
+  also listed. First occurrence stays `valid`. A duplicate's money fields are nulled so
+  it can never inflate revenue.
+  1. `DUPLICATE_ID` — the same `transaction_id` appears again.
+  2. `DUPLICATE_RECORD` — a *fresh* id whose every other field (region, category,
+     quantity, unit price, discount, date) matches an earlier row.
+
+  **Why both.** The brief lists "duplicate `transaction_id`s flagged", yet its own
+  sample file calls `TXN-1005` a duplicate of `TXN-1001` although the two ids differ —
+  only the contents repeat. Honouring just the stated rule would fail the brief's own
+  acceptance note, so both signals are implemented. Content matching can in principle
+  collide with two genuinely distinct sales that agree on every field; that trade is
+  documented, and `DUPLICATE_DETECTION=id` narrows it back to id-only matching.
 - `invalid` — one or more field errors.
 - `valid` — no errors.
 
@@ -46,7 +57,8 @@ Field rules (error `code` in parentheses):
 | unit_price | required, parses as number, `>= 0` | `MISSING_FIELD` / `NOT_A_NUMBER` / `NEGATIVE_VALUE` |
 | discount_percent | optional — blank/absent ⇒ `0.0`; if present must parse and be `0 <= d <= 100` | `NOT_A_NUMBER` / `OUT_OF_RANGE` |
 | transaction_date | required, parseable date (`YYYY-MM-DD`, `DD/MM/YYYY`, `MM/DD/YYYY`, ISO-8601 datetime), not in the future (compared to UTC today) | `MISSING_FIELD` / `INVALID_DATE` / `FUTURE_DATE` |
-| — | unknown `transaction_id` repeat | `DUPLICATE_ID` |
+| — | repeated `transaction_id` | `DUPLICATE_ID` |
+| — | repeated row contents under a new id | `DUPLICATE_RECORD` |
 
 Unparseable/short/long CSV lines never abort the run; they become `invalid` rows
 with code `MALFORMED_ROW`.
@@ -176,7 +188,18 @@ Routes: `/login`, `/signup`, `/` (jobs dashboard), `/jobs/:id` (job detail), `/a
 
 ## 7. Acceptance
 
-The sample file from the brief (7 rows) must yield: 4 valid, 2 invalid
-(`TXN-1003` negative quantity, `TXN-1006` malformed price), 1 duplicate
-(`TXN-1005`), 1 invalid future date (`TXN-1007`) — i.e. **3 invalid, 1 duplicate,
-3 valid** — with no crash, and a complete report rendered in the UI.
+`sample_data/sample_sales.csv` (the brief's 7 rows, unmodified) must yield
+**3 valid · 3 invalid · 1 duplicate** with no crash, and a complete report in the UI:
+
+| Row | Outcome | Reason |
+|---|---|---|
+| TXN-1001 | valid | net 1349.97 |
+| TXN-1002 | valid | net 186.00 |
+| TXN-1003 | invalid | `NEGATIVE_VALUE` (quantity −2) |
+| TXN-1004 | valid | net 199.96 |
+| TXN-1005 | duplicate | `DUPLICATE_RECORD` (identical to TXN-1001) |
+| TXN-1006 | invalid | `NOT_A_NUMBER` (unit_price `abc`) |
+| TXN-1007 | invalid | `FUTURE_DATE` (2099-01-01) |
+
+Totals: revenue **1735.93**, gross **1935.92**, discount impact **199.99**,
+AOV **578.64**, median **199.96**.

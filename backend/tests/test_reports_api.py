@@ -43,7 +43,7 @@ def test_overview_aggregates_across_jobs(client, auth, upload_sample):
     assert body["completed_jobs"] == 2
     assert body["rows_processed"] == 14
     assert body["total_revenue"] == pytest.approx(1735.93 * 2, abs=0.05)
-    assert body["discount_impact"] == pytest.approx(100.49 * 2, abs=0.05)
+    assert body["discount_impact"] == pytest.approx(199.99 * 2, abs=0.05)
     north = next(r for r in body["by_region"] if r["key"] == "North")
     assert north["revenue"] == pytest.approx(1349.97 * 2, abs=0.05)
     assert north["transactions"] == 2

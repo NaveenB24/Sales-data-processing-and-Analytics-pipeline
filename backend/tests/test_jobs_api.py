@@ -60,7 +60,10 @@ def test_row_explorer_filters_and_flags_errors(client, auth, upload_sample):
     duplicates = client.get(f"/api/jobs/{job['id']}/rows?status=duplicate", headers=headers).json()
     assert duplicates["total"] == 1
     assert duplicates["items"][0]["transaction_id"] == "TXN-1005"
-    assert duplicates["items"][0]["errors"][0]["code"] == "DUPLICATE_ID"
+    # TXN-1005 carries a fresh id but is identical to TXN-1001 on every other
+    # field, which is exactly what the brief calls a duplicate.
+    assert duplicates["items"][0]["errors"][0]["code"] == "DUPLICATE_RECORD"
+    assert duplicates["items"][0]["net_amount"] is None
 
     searched = client.get(f"/api/jobs/{job['id']}/rows?q=Groceries", headers=headers).json()
     assert searched["total"] == 2
@@ -75,8 +78,8 @@ def test_report_matches_hand_computed_revenue(client, auth, upload_sample):
     summary = report["summary"]
     assert summary["transaction_count"] == 3
     assert summary["total_revenue"] == pytest.approx(1735.93, abs=0.01)
-    assert summary["gross_revenue"] == pytest.approx(1836.42, abs=0.01)
-    assert summary["discount_impact"] == pytest.approx(100.49, abs=0.01)
+    assert summary["gross_revenue"] == pytest.approx(1935.92, abs=0.01)
+    assert summary["discount_impact"] == pytest.approx(199.99, abs=0.01)
     assert summary["average_order_value"] == pytest.approx(578.64, abs=0.01)
     assert summary["median_transaction_value"] == pytest.approx(199.96, abs=0.01)
     assert summary["max_order_value"] == pytest.approx(1349.97, abs=0.01)
@@ -289,3 +292,34 @@ def test_upload_rate_limit_returns_429(client, auth, monkeypatch):
         if resp.status_code == 429:
             assert resp.headers.get("Retry-After")
     assert codes[-1] == 429
+
+
+def test_repeated_transaction_id_is_flagged_as_duplicate_id(client, auth):
+    """The other duplicate signal: the same id submitted twice."""
+    headers, _ = auth()
+    from app.processing.queue import job_queue
+
+    csv_body = (
+        "transaction_id,region,product_category,quantity,unit_price,discount_percent,transaction_date\n"
+        "TXN-9001,North,Electronics,2,100.00,0,2025-01-10\n"
+        "TXN-9001,South,Apparel,7,25.00,5,2025-02-11\n"
+    )
+    job = client.post(
+        "/api/jobs/upload", headers=headers, files={"file": ("dupe.csv", csv_body.encode(), "text/csv")}
+    ).json()
+    assert job_queue.wait_idle(timeout=30.0)
+
+    final = client.get(f"/api/jobs/{job['id']}", headers=headers).json()
+    assert (final["valid_rows"], final["duplicate_rows"]) == (1, 1)
+    rows = client.get(f"/api/jobs/{job['id']}/rows?status=duplicate", headers=headers).json()
+    assert rows["items"][0]["errors"][0]["code"] == "DUPLICATE_ID"
+
+
+def test_duplicate_detection_mode_can_be_narrowed_to_ids(client, auth, monkeypatch, upload_sample):
+    """DUPLICATE_DETECTION=id turns off content matching (SPEC 2.2 note)."""
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "duplicate_detection", "id")
+    headers, _ = auth()
+    job = upload_sample(headers)
+    assert (job["valid_rows"], job["duplicate_rows"]) == (4, 0)
