@@ -1,0 +1,22 @@
+services:
+  api:
+    build: ./backend
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      DATABASE_URL: sqlite:////app/data/sales.db
+      CORS_ORIGINS: http://localhost:8080
+      WORKER_POOL_SIZE: 8
+    volumes:
+      - api-data:/app/data
+    ports:
+      - "8000:8000"
+
+  web:
+    build: ./frontend
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+
+volumes:
+  api-data:
