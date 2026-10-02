@@ -1,0 +1,8 @@
+transaction_id,region,product_category,quantity,unit_price,discount_percent,transaction_date
+TXN-1001,North,Electronics,3,499.99,10,2025-01-15
+TXN-1002,South,Groceries,12,15.50,0,2025-01-15
+TXN-1003,East,Electronics,-2,299.00,5,2025-01-16
+TXN-1004,West,Apparel,5,49.99,20,2025-01-16
+TXN-1005,North,Electronics,3,499.99,10,2025-01-15
+TXN-1006,South,Groceries,7,abc,0,2025-01-17
+TXN-1007,East,Apparel,1,89.99,,2099-01-01

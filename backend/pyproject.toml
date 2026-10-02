@@ -1,0 +1,11 @@
+[project]
+name = "sales-data-processor-backend"
+version = "1.0.0"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q --strict-markers"
+markers = ["slow: long-running tests (large files, concurrency timing)"]
+filterwarnings = ["ignore::DeprecationWarning"]

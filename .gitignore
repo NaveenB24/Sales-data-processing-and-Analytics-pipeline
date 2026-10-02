@@ -1,0 +1,30 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Data & runtime
+*.db
+*.db-wal
+*.db-shm
+backend/data/
+backend/logs/
+logs/
+uploads/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Env
+.env
+.env.local
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
