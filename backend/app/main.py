@@ -27,6 +27,7 @@ log = get_logger("http")
 FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
 
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     configure_logging()
